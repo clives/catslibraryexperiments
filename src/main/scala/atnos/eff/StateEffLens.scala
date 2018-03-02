@@ -27,15 +27,21 @@ trait StateEffLens {
   val setter = (pair: (Int, Int), j: Int) => (pair._1, j)
   val lensed = lensState(action, getter, setter)
 
+}
 
+trait StateEffLensWithCaseClass{
   case class personContact( name: String, phoneNumber: String)
   val getterName = ( personcontact: personContact) => personcontact.name
   val setterName = ( personcontact: personContact, newName: String) => personcontact.copy( name= newName)
 
+  val getterPhone = ( personcontact: personContact) => personcontact.phoneNumber
+  val setterPhone = ( personcontact: personContact, newphoneNumber: String) => personcontact.copy( phoneNumber= newphoneNumber)
+
+
   type StatePersonContact[A] = State[personContact,A]
   type StateString[A] = State[String,A]
-  type TSSP = Fx.fx1[StatePersonContact]
   type TSP = Fx.fx1[StateString]
+
 
 
   val nameUpperCase: Eff[ TSP, String] = for {
@@ -43,15 +49,25 @@ trait StateEffLens {
     result <- get[TSP, String]
   }yield result;
 
-  val lensed2 = lensState(nameUpperCase, getterName, setterName)
+  val addCountryCode: Eff[ TSP, String] = for {
+    _ <- modify[TSP, String ]( "+54" + _ )
+    result <- get[TSP, String]
+  }yield result;
+
+  val updateName = lensState(nameUpperCase, getterName, setterName)
+
+  val updatePhoneNumber = lensState(addCountryCode, getterPhone, setterPhone)
 }
 
 
-object appStateEffLens extends StateEffLens with App {
+object appStateEffLens extends StateEffLens with App with StateEffLensWithCaseClass {
   println("lens to know how to read/write  the paire state")
   println("result:" + lensed.runOption.runState((20, 30)).run )
 
 
   println("lens on a case class")
-  println("result:" + lensed2.runState( personContact("lowercasename", "0238")).run )
+  println("result:" + updateName.runState( personContact("lowercasename", "0238")).run )
+
+  println("Composition:")
+  println("result:" + (updateName >> updatePhoneNumber).runState( personContact("lowercasename", "0238")).run )
 }

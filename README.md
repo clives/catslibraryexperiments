@@ -8,3 +8,5 @@
 [Eff for cats](http://atnos-org.github.io/eff/index.html)
 
 
+[Reference book by underscore](https://underscore.io/books/scala-with-cats/)
+
