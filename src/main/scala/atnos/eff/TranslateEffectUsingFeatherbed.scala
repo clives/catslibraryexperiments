@@ -77,12 +77,11 @@ trait TranslateEffectUsingFeatherbed {
 
 object appTranslateEffectUsingFeatherbed extends TranslateEffectUsingFeatherbed with App {
 
-
+  import org.atnos.eff.syntax.either._
   implicit val scheduler = ExecutorServices.schedulerFromGlobalExecutionContext
   import org.atnos.eff.syntax.future._
   import scala.concurrent._, duration._
   import scala.concurrent.ExecutionContext.Implicits.global
 
-   Await.result(result.runSequential , 1 second)
-
+   Await.result(result.runEither.runSequential.map(println _) , 1 second)
 }
