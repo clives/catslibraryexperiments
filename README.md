@@ -60,6 +60,50 @@ updateName.runState( personContact("lowercasename", "0238")).run
 
 ------------------------
 
+#### Eff - simple use case implicit lens and functional compose of two functions with different signature.
+
+[simpleUseCase](./src/main/scala/atnos/eff/simpleUseCase.scala)
+
+
+**data:**
+```scala
+  case class Order(price: Int, currentProfit: Int)
+  case class UserOrders(orders: List[Order], userName: String)
+```
+
+
+**basic function:**
+```scala
+  def updateOrdersProfit[E : _writerString : _stateOrder ](currentprice: Int): Eff[ E, Unit] = for {
+      _ <- modify[E, List[Order]] { orders: List[Order] =>
+        orders.map { order => order.copy(currentProfit = currentprice - order.price) }
+      }
+    } yield ();
+
+
+  def printUserOrders[E: _writerString : _stateUserOrders]:Eff[E,Unit] = for {
+     v1 <- get[E, UserOrders]
+     _ <- tell(  s"Username: ${v1.userName}, total profit: ${v1.orders.map(_.currentProfit).sum}")
+  }yield ();
+```
+
+
+**implicit setter/getter from UserOrders to List(Order)**
+```scala
+  //lens
+  implicit val getterOrders : UserOrders => List[Order] = (userorders: UserOrders) => userorders.orders
+  implicit val setterOrders : List[Order] => UserOrders => UserOrders = (orders: List[Order]) => (userorders: UserOrders)  => userorders.copy(orders = orders)
+```
+
+**the program based on the two functions:**
+```scala
+  def programUpdateProfitShowResult[E: _writerString : _stateUserOrders](newPrice: Int):Eff[E,Unit] = for {
+    _ <- updateOrdersProfit(newPrice)
+    _ <- printUserOrders
+  }yield();
+```
+
+------------------------
 #### Library / Sources
 
 [Cats](https://typelevel.org/cats/)
