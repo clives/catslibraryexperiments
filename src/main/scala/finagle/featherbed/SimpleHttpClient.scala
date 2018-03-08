@@ -38,6 +38,6 @@ trait SimpleHttpClient {
   }
 }
 
-object SimpleHttpClient extends SimpleHttpClient with App {
+object AppSimpleHttpClient extends SimpleHttpClient with App {
   testGetClients()
 }
