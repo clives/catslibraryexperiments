@@ -24,9 +24,6 @@ trait simpleUseCase {
   type _writerString[E] = WriterString |= E
   type _stateOrder[E] = StateOrder |= E
   type _stateUserOrders[E] = StateUserOrders |= E
-
-
-  type OrderS[E] = State[Order, ?] |= E
   type UserOrderS[E] = State[UserOrders, ?] |= E
 
 
